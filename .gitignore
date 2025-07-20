@@ -1,0 +1,263 @@
+# TwitterMentions Project .gitignore
+
+# ================================================
+# ENVIRONMENT & SECRETS (CRITICAL - NEVER COMMIT)
+# ================================================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+.env.*
+
+# ================================================
+# NODE.JS DEPENDENCIES & ARTIFACTS
+# ================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Snowpack dependency directory (https://snowpack.dev/)
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ================================================
+# LOGS & RUNTIME FILES
+# ================================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Bot specific logs
+TwitterMentions.log
+twitter-bot.log
+mentions.log
+
+# ================================================
+# DOCKER & CONTAINERIZATION
+# ================================================
+# Don't ignore Dockerfile and docker-compose.yml (they should be committed)
+# But ignore runtime docker artifacts
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# ================================================
+# IDE & EDITOR FILES
+# ================================================
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.swp
+*.swo
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*~
+*.swp
+*.swo
+.*.sw*
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ================================================
+# OPERATING SYSTEM FILES
+# ================================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ================================================
+# TEMPORARY & BUILD FILES
+# ================================================
+tmp/
+temp/
+.tmp/
+.temp/
+dist/
+build/
+out/
+*.tmp
+
+# ================================================
+# TESTING & COVERAGE
+# ================================================
+coverage/
+.nyc_output/
+.coverage/
+.pytest_cache/
+.cache/
+
+# ================================================
+# BACKUP & ARCHIVE FILES
+# ================================================
+*.backup
+*.bak
+*.orig
+*.rej
+*.patch
+*.diff
+
+# ================================================
+# PROJECT SPECIFIC
+# ================================================
+# Webhook testing artifacts
+webhook-test-*
+test-responses/
+
+# Local development overrides
+config/local.*
+src/config/local.*
+
+# Database files (if any)
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# ================================================
+# SECURITY & SENSITIVE DATA
+# ================================================
+# SSH keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Certificates
+*.crt
+*.cer
+*.p7b
+*.p7c
+*.der
+
+# API keys and tokens (additional safety)
+*api-key*
+*bearer-token*
+*secret*
+*password*
+*token*
+
+# ================================================
+# DOCUMENTATION BUILDS
+# ================================================
+docs/build/
+docs/_build/
+docs/dist/
+
+# ================================================
+# PACKAGE MANAGER LOCKS (PROJECT DECISION)
+# ================================================
+# Uncomment the line below if you want to ignore package-lock.json
+# package-lock.json
+
+# Uncomment the line below if you want to ignore yarn.lock
+# yarn.lock
+
+# ================================================
+# MISC
+# ================================================
+.DS_Store
+*.tgz
+*.tar.gz

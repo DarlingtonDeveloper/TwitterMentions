@@ -1,4 +1,3 @@
-// src/config/index.js
 require('dotenv').config();
 
 const config = {
@@ -33,11 +32,11 @@ const config = {
         endpoint: '/health',
     },
 
-    // Stream Configuration
-    stream: {
-        reconnectAttempts: parseInt(process.env.STREAM_RECONNECT_ATTEMPTS) || 10,
-        reconnectDelay: parseInt(process.env.STREAM_RECONNECT_DELAY) || 1000,
-        keepAliveTimeout: parseInt(process.env.STREAM_KEEPALIVE_TIMEOUT) || 20000,
+    // Polling Configuration (NEW)
+    polling: {
+        interval: parseInt(process.env.POLLING_INTERVAL) || 5 * 60 * 1000, // 5 minutes default
+        maxResults: parseInt(process.env.POLLING_MAX_RESULTS) || 10,
+        rateLimitBuffer: parseInt(process.env.RATE_LIMIT_BUFFER) || 50, // Stay 50 requests below limit
     },
 
     // Webhook Configuration
@@ -72,13 +71,13 @@ function validateConfig() {
         errors.push('WEBHOOK_URL must be a valid URL');
     }
 
-    // Validate numeric configurations
-    if (isNaN(config.stream.reconnectAttempts) || config.stream.reconnectAttempts < 0) {
-        errors.push('STREAM_RECONNECT_ATTEMPTS must be a positive number');
+    // Validate polling configuration
+    if (isNaN(config.polling.interval) || config.polling.interval < 60000) {
+        errors.push('POLLING_INTERVAL must be at least 60000ms (1 minute)');
     }
 
-    if (isNaN(config.stream.reconnectDelay) || config.stream.reconnectDelay < 0) {
-        errors.push('STREAM_RECONNECT_DELAY must be a positive number');
+    if (isNaN(config.polling.maxResults) || config.polling.maxResults < 1 || config.polling.maxResults > 100) {
+        errors.push('POLLING_MAX_RESULTS must be between 1 and 100');
     }
 
     if (errors.length > 0) {
@@ -104,7 +103,7 @@ const safeConfig = {
 };
 
 if (config.app.nodeEnv === 'development') {
-    console.log('📋 Configuration loaded:', JSON.stringify(safeConfig, null, 2));
+    console.log('📋 Configuration loaded (Polling Mode):', JSON.stringify(safeConfig, null, 2));
 }
 
 module.exports = config;

@@ -1,4 +1,4 @@
-const TwitterStream = require('./services/twitterStream');
+const TwitterPolling = require('./services/twitterPolling');
 const WebhookService = require('./services/webhook');
 const config = require('./config');
 const logger = require('./utils/logger');
@@ -6,7 +6,7 @@ const express = require('express');
 
 class TwitterMentionBot {
     constructor() {
-        this.twitterStream = new TwitterStream();
+        this.twitterPolling = new TwitterPolling();
         this.webhookService = new WebhookService();
         this.isRunning = false;
         this.app = express();
@@ -19,21 +19,22 @@ class TwitterMentionBot {
     setupHealthCheck() {
         // Health check endpoint
         this.app.get('/health', (req, res) => {
-            const streamStatus = this.twitterStream.getStatus();
+            const pollingStatus = this.twitterPolling.getStatus();
             const webhookInfo = this.webhookService.getWebhookInfo();
 
             const health = {
-                status: this.isRunning && streamStatus.isConnected ? 'healthy' : 'unhealthy',
+                status: this.isRunning ? 'healthy' : 'unhealthy',
                 timestamp: new Date().toISOString(),
                 version: config.app.version,
                 uptime: process.uptime(),
                 memory: process.memoryUsage(),
-                stream: streamStatus,
+                polling: pollingStatus,
                 webhook: webhookInfo,
                 config: {
                     targetUser: config.twitter.targetUsername,
                     logLevel: config.logging.level,
-                    nodeEnv: config.app.nodeEnv
+                    nodeEnv: config.app.nodeEnv,
+                    mode: 'polling'
                 }
             };
 
@@ -46,16 +47,39 @@ class TwitterMentionBot {
             res.json({
                 name: config.app.name,
                 version: config.app.version,
-                description: 'Real-time Twitter mention detection bot',
+                description: 'Real-time Twitter mention detection bot (Polling Mode)',
                 status: this.isRunning ? 'running' : 'stopped',
-                targetUser: config.twitter.targetUsername
+                targetUser: config.twitter.targetUsername,
+                mode: 'polling',
+                pollingInterval: `${this.twitterPolling.pollingInterval / 1000 / 60} minutes`
             });
+        });
+
+        // Test webhook endpoint
+        this.app.post('/test-webhook', async (req, res) => {
+            try {
+                logger.info('🧪 Manual webhook test requested');
+                const testResult = await this.webhookService.sendTest();
+
+                res.json({
+                    success: testResult.success,
+                    message: testResult.success ? 'Test webhook sent successfully!' : 'Test webhook failed',
+                    details: testResult
+                });
+            } catch (error) {
+                logger.error('Test webhook error:', error);
+                res.status(500).json({
+                    success: false,
+                    message: 'Test webhook failed',
+                    error: error.message
+                });
+            }
         });
     }
 
     async start() {
         try {
-            logger.info('🚀 Starting Twitter Mention Bot...');
+            logger.info('🚀 Starting Twitter Mention Bot (Polling Mode)...');
 
             // Validate configuration
             this.validateConfig();
@@ -66,28 +90,26 @@ class TwitterMentionBot {
             }
 
             // Set up mention handler
-            this.twitterStream.onMention(async (tweet) => {
+            this.twitterPolling.onMention(async (tweet) => {
                 await this.handleMention(tweet);
             });
 
             // Set up error handlers
-            this.twitterStream.onError((error) => {
-                logger.error('Twitter stream error:', error);
+            this.twitterPolling.onError((error) => {
+                logger.error('Twitter polling error:', error);
             });
 
-            this.twitterStream.onReconnect((attempt) => {
-                logger.info(`Reconnecting to Twitter stream (attempt ${attempt})...`);
-            });
-
-            // Start the stream
-            await this.twitterStream.start();
+            // Start the polling service
+            await this.twitterPolling.start();
             this.isRunning = true;
 
-            logger.info('✅ Twitter Mention Bot is now running and listening for mentions!');
+            logger.info('✅ Twitter Mention Bot is now running in polling mode!');
             logger.info(`🎯 Monitoring mentions for user: ${config.twitter.targetUsername}`);
+            logger.info(`⏰ Checking every ${this.twitterPolling.pollingInterval / 1000 / 60} minutes`);
             logger.info(`🔗 Webhook URL: ${config.webhook.url}`);
             if (config.health.enabled) {
                 logger.info(`💚 Health check available at: http://localhost:${config.app.port}/health`);
+                logger.info(`🧪 Test webhook at: http://localhost:${config.app.port}/test-webhook`);
             }
 
         } catch (error) {
@@ -135,7 +157,8 @@ class TwitterMentionBot {
                 },
                 bot_info: {
                     target_user: config.twitter.targetUsername,
-                    processed_at: new Date().toISOString()
+                    processed_at: new Date().toISOString(),
+                    mode: 'polling'
                 }
             };
 
@@ -166,7 +189,8 @@ class TwitterMentionBot {
     async stop() {
         if (this.isRunning) {
             logger.info('🛑 Stopping Twitter Mention Bot...');
-            await this.twitterStream.stop();
+
+            await this.twitterPolling.stop();
 
             // Stop health server
             if (this.server) {
