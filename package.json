@@ -1,0 +1,43 @@
+{
+    "name": "TwitterMentions",
+    "version": "1.0.0",
+    "description": "Real-time Twitter mention detection bot with webhook delivery",
+    "main": "src/app.js",
+    "scripts": {
+        "start": "node src/app.js",
+        "dev": "nodemon src/app.js",
+        "test": "node src/test.js",
+        "docker:build": "docker build -t TwitterMentions .",
+        "docker:run": "docker run --env-file .env TwitterMentions",
+        "lint": "eslint src/",
+        "health": "curl -f http://localhost:${PORT:-3000}/health || exit 1"
+    },
+    "keywords": [
+        "twitter",
+        "api",
+        "streaming",
+        "mentions",
+        "webhook",
+        "bot",
+        "real-time"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "twitter-api-v2": "^1.24.0",
+        "axios": "^1.6.0",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1",
+        "eslint": "^8.50.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/DarlingtonDeveloper/TwitterMentions.git"
+    }
+}
